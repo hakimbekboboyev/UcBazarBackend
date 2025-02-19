@@ -108,7 +108,7 @@ public class UcPaymentService {
 
 
             }
-            /*if(e.getStatusCode().value() == 403){
+            if(e.getStatusCode().value() == 403){
                 Error error = Error.builder()
                         .errorCode(403)
                         .errorMessage(e.getMessage())
@@ -121,7 +121,7 @@ public class UcPaymentService {
                         .payment(response)
                         .status(403)
                         .build();
-            }*/
+            }
             throw e;
 
 
@@ -154,7 +154,7 @@ public class UcPaymentService {
                         .status(400)
                         .build();
             }
-            /*if(e.getStatusCode().value() == 403){
+            if(e.getStatusCode().value() == 403){
                 Error error = Error.builder()
                         .errorCode(403)
                         .errorMessage(e.getMessage())
@@ -167,7 +167,7 @@ public class UcPaymentService {
                         .payment(response)
                         .status(403)
                         .build();
-            }*/
+            }
             throw e;
         }
     }
