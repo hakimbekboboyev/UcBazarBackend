@@ -1,0 +1,35 @@
+
+spring:
+  application:
+    name : "UcBazar"
+
+  datasource:
+    url: jdbc:postgresql://turntable.proxy.rlwy.net:33334/railway
+    username: postgres
+    password: xUsTGQOfuMRDlDSsjZdcAcWjrIZzzZQZ
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+api:
+  user:
+    name: mangoevolution
+    password: 4TFhwIH^K1DK*$GY94Chi{lHd
+  payment: https://pay.myuzcard.uz/api
+
+server:
+  port: 8081
+
+
+
+

@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.2'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+group = 'ru.moscow'
+version = '0.0.1-SNAPSHOT'
+
+java {
+}
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
+//    implementation("org.jetbrains.kotlin:kotlin-reflect")
+//    // https://mvnrepository.com/artifact/javax.servlet/servlet-api
+//    compileOnly group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+
+
+
+//    Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+
+
+//tasks.named('test') {
+////    useJUnitPlatform()
+//    jacoco.includeNoLocationClasses = true
+//    jacoco.excludes = ['jdk.internal.*']
+//}
+kotlin {
+    jvmToolchain(17)
+}
+
