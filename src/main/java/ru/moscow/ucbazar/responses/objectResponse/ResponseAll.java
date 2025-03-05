@@ -1,4 +1,4 @@
-package ru.moscow.ucbazar.responses.payment;
+package ru.moscow.ucbazar.responses.objectResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ResponseAll<T> {
-    private T payment;
+    private T response;
     private int status;
 }

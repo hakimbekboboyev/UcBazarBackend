@@ -26,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         servers = {
                 @Server(
                         description = "Dev api",
-                        url = "https://ucbazarbackend.onrender.com/"
+                        url = "http://13.61.186.1"
                 ),
                 @Server(
                         description = "Dev(test)",

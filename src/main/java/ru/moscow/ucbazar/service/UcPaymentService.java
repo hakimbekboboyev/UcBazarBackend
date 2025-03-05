@@ -10,18 +10,22 @@ import org.springframework.web.client.RestTemplate;
 import ru.moscow.ucbazar.dto.PaymentUcDto;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
-import ru.moscow.ucbazar.entity.PaymentUcEntity;
+import ru.moscow.ucbazar.entity.payment.PaymentUcEntity;
 import ru.moscow.ucbazar.entity.UcEntity;
+import ru.moscow.ucbazar.entity.payment.UcPayment;
+import ru.moscow.ucbazar.enums.PaymentStatusEnum;
 import ru.moscow.ucbazar.repository.PaymentUcRepository;
+import ru.moscow.ucbazar.repository.PaymentWithRegsRepository;
 import ru.moscow.ucbazar.repository.UcRepository;
 import ru.moscow.ucbazar.responses.payment.ConfirmResponse;
-import ru.moscow.ucbazar.responses.payment.Error;
-import ru.moscow.ucbazar.responses.payment.ResponseAll;
+import ru.moscow.ucbazar.responses.objectResponse.Error;
+import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.ResponsePaymentWithoutRegistration;
 import ru.moscow.ucbazar.responses.ResponseUcInfo;
 import ru.moscow.ucbazar.responses.ResponseUcPayment;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UcPaymentService {
@@ -30,9 +34,11 @@ public class UcPaymentService {
 
     @Autowired
     UcRepository ucRepository;
-
     @Autowired
     PaymentUcRepository paymentUcRepository;
+
+    @Autowired
+    PaymentWithRegsRepository ucPaymentRep;
 
     @Value("${api.payment}")
     private String api;
@@ -83,6 +89,8 @@ public class UcPaymentService {
     public ResponseAll<ResponsePaymentWithoutRegistration> paymentWithoutRegistration(UcPaymentDto ucPaymentDto){
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, password);
+        String guid = UUID.randomUUID().toString();
+        ucPaymentDto.setExtraId(guid);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -93,8 +101,17 @@ public class UcPaymentService {
                     HttpMethod.POST,
                     entity, ResponsePaymentWithoutRegistration.class).getBody();
 
+            assert result != null;
+            UcPayment ucPayment = UcPayment.builder()
+                    .sessionId(result.getResult().getSession())
+                    .amount(ucPaymentDto.getAmount())
+                    .status(PaymentStatusEnum.CREATED)
+                    .build();
+
+            ucPaymentRep.save(ucPayment);
+
             return ResponseAll.<ResponsePaymentWithoutRegistration>builder()
-                    .payment(result)
+                    .response(result)
                     .status(200)
                     .build();
         }
@@ -102,7 +119,7 @@ public class UcPaymentService {
             if (e.getStatusCode().value() == 400) {
                 ResponsePaymentWithoutRegistration result =  e.getResponseBodyAs(ResponsePaymentWithoutRegistration.class);
                 return ResponseAll.<ResponsePaymentWithoutRegistration>builder()
-                        .payment(result)
+                        .response(result)
                         .status(400)
                         .build();
 
@@ -118,7 +135,7 @@ public class UcPaymentService {
                         .error(error)
                         .build();
                 return ResponseAll.<ResponsePaymentWithoutRegistration>builder()
-                        .payment(response)
+                        .response(response)
                         .status(403)
                         .build();
             }
@@ -141,16 +158,40 @@ public class UcPaymentService {
             ConfirmResponse result = restTemplate.exchange(this.api + "/Payment/confirmPayment",
                     HttpMethod.POST,
                     entity, ConfirmResponse.class).getBody();
+
+            assert result != null;
+
+            Optional<UcPayment> byId = ucPaymentRep.findBySessionId(confirmPayment.getSession());
+            if(byId.isPresent()){
+                UcPayment ucPayment = byId.get();
+                ucPayment.setUuid(UUID.randomUUID().toString());
+                ucPayment.setCardNumber(result.getResult().getCardNumber());
+                ucPayment.setStatus(PaymentStatusEnum.SUCCEEDED);
+                ucPaymentRep.save(ucPayment);
+            }
+
             return ResponseAll.<ConfirmResponse>builder()
-                    .payment(result)
+                    .response(result)
                     .status(200)
                     .build();
         }
         catch (HttpClientErrorException e) {
+
+
             if (e.getStatusCode().value() == 400) {
                 ConfirmResponse result =  e.getResponseBodyAs(ConfirmResponse.class);
+
+                assert result != null;
+
+                Optional<UcPayment> byId = ucPaymentRep.findBySessionId(confirmPayment.getSession());
+                if(byId.isPresent()){
+                    UcPayment ucPayment = byId.get();
+                    ucPayment.setStatus(PaymentStatusEnum.FAILED);
+                    ucPaymentRep.save(ucPayment);
+                }
+
                 return ResponseAll.<ConfirmResponse>builder()
-                        .payment(result)
+                        .response(result)
                         .status(400)
                         .build();
             }
@@ -164,7 +205,7 @@ public class UcPaymentService {
                         .error(error)
                         .build();
                 return ResponseAll.<ConfirmResponse>builder()
-                        .payment(response)
+                        .response(response)
                         .status(403)
                         .build();
             }
