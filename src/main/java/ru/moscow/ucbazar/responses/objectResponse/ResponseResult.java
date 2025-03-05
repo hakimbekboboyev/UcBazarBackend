@@ -1,4 +1,4 @@
-package ru.moscow.ucbazar.responses.payment;
+package ru.moscow.ucbazar.responses.objectResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class Error {
-
-    private Integer errorCode;
-
-    private String errorMessage;
+public class ResponseResult<T> {
+    private T result;
+    private Error error;
 }

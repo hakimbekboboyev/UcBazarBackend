@@ -29,4 +29,6 @@ public class UcEntity implements Serializable {
     private Integer bonus;
 
 
+
+
 }

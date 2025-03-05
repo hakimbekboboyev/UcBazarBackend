@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
 import ru.moscow.ucbazar.responses.payment.ConfirmResponse;
-import ru.moscow.ucbazar.responses.payment.ResponseAll;
+import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.ResponsePaymentWithoutRegistration;
 import ru.moscow.ucbazar.service.ClonePaymentService;
-import ru.moscow.ucbazar.service.UcPaymentService;
 
 @RestController()
 @RequestMapping("/api/clone")
@@ -26,7 +25,7 @@ public class CloneUcPaymentController {
     public ResponseEntity<ResponsePaymentWithoutRegistration> payment(@RequestBody UcPaymentDto ucPaymentDto){
         ResponseAll<ResponsePaymentWithoutRegistration> result = ucPaymentService.paymentWithoutRegistration(ucPaymentDto);
 
-        return ResponseEntity.status(result.getStatus()).body(result.getPayment());
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
     @Operation(summary = "confirmPayment", description = "Pyment Confirm")
@@ -34,6 +33,6 @@ public class CloneUcPaymentController {
     public ResponseEntity<ConfirmResponse> payment(@RequestBody ConfirmPayment confirmPayment){
         ResponseAll<ConfirmResponse> result = ucPaymentService.confirmPayment(confirmPayment);
 
-        return ResponseEntity.status(result.getStatus()).body(result.getPayment());
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 }

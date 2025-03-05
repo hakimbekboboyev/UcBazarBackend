@@ -1,5 +1,6 @@
 package ru.moscow.ucbazar.dto.payment;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class UcPaymentDto {
 
     private BigDecimal amount;
 
+    @Hidden
     private String extraId;
 
     private String transactionData;

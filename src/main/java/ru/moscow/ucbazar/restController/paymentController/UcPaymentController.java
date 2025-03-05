@@ -9,7 +9,7 @@ import ru.moscow.ucbazar.dto.PaymentUcDto;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
 import ru.moscow.ucbazar.responses.payment.ConfirmResponse;
-import ru.moscow.ucbazar.responses.payment.ResponseAll;
+import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.ResponsePaymentWithoutRegistration;
 import ru.moscow.ucbazar.responses.ResponseUcPayment;
 import ru.moscow.ucbazar.service.UcPaymentService;
@@ -35,7 +35,7 @@ public class UcPaymentController {
     public ResponseEntity<ResponsePaymentWithoutRegistration> payment(@RequestBody UcPaymentDto ucPaymentDto){
         ResponseAll<ResponsePaymentWithoutRegistration> result = ucPaymentService.paymentWithoutRegistration(ucPaymentDto);
 
-        return ResponseEntity.status(result.getStatus()).body(result.getPayment());
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
     @Operation(summary = "confirmPayment", description = "Pyment Confirm")
@@ -43,7 +43,7 @@ public class UcPaymentController {
     public ResponseEntity<ConfirmResponse> payment(@RequestBody ConfirmPayment confirmPayment){
         ResponseAll<ConfirmResponse> result = ucPaymentService.confirmPayment(confirmPayment);
 
-        return ResponseEntity.status(result.getStatus()).body(result.getPayment());
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
 }

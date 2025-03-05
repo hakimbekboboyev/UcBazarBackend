@@ -3,8 +3,9 @@ package ru.moscow.ucbazar.service;
 import org.springframework.stereotype.Service;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
+import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.*;
-import ru.moscow.ucbazar.responses.payment.Error;
+import ru.moscow.ucbazar.responses.objectResponse.Error;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -33,7 +34,7 @@ public class ClonePaymentService {
 
 
         return ResponseAll.<ResponsePaymentWithoutRegistration>builder()
-                .payment(result)
+                .response(result)
                 .status(200)
                 .build();
     }
@@ -67,7 +68,7 @@ public class ClonePaymentService {
                 .build();
 
         return ResponseAll.<ConfirmResponse>builder()
-                .payment(result)
+                .response(result)
                 .status(200)
                 .build();
     }
