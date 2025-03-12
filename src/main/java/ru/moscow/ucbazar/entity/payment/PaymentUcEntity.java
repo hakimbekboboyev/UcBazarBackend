@@ -1,3 +1,4 @@
+/*
 package ru.moscow.ucbazar.entity.payment;
 
 import jakarta.persistence.Entity;
@@ -34,3 +35,4 @@ public class PaymentUcEntity {
     private long pubg_id;
 
 }
+*/
