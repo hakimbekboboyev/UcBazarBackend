@@ -5,8 +5,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://turntable.proxy.rlwy.net:33334/railway
-    username: postgres
-    password: xUsTGQOfuMRDlDSsjZdcAcWjrIZzzZQZ
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -23,8 +23,8 @@ spring:
 
 api:
   user:
-    name: mangoevolution
-    password: 4TFhwIH^K1DK*$GY94Chi{lHd
+    name: ${PAYMENT_USR}
+    password: ${PAYMENT_PASS}
   payment: https://pay.myuzcard.uz/api
 
 server:
