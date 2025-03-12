@@ -1,4 +1,4 @@
-package ru.moscow.ucbazar.responses.payment;
+package ru.moscow.ucbazar.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class SentOtpResult {
-    private Long session;
 
-    private Long transactionId;
+public class GetCardOwnerInfo {
 
-    private String otpSentPhone;
+    private String cardNumber;
+
+    private String owner;
+
+    private BankInfo bankInfo;
 
 }

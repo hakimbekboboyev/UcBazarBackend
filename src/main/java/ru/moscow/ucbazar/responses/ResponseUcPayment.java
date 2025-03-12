@@ -1,3 +1,4 @@
+/*
 package ru.moscow.ucbazar.responses;
 
 import lombok.AllArgsConstructor;
@@ -16,3 +17,4 @@ public class ResponseUcPayment {
     private ResponseUcInfo uc_info;
 
 }
+*/

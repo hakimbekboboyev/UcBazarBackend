@@ -1,4 +1,4 @@
-package ru.moscow.ucbazar.responses.payment;
+package ru.moscow.ucbazar.responses.objectResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class SentOtpResult {
-    private Long session;
+public class Error {
 
-    private Long transactionId;
+    private Integer errorCode;
 
-    private String otpSentPhone;
-
+    private String errorMessage;
 }

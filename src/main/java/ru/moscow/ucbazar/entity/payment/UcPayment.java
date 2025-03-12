@@ -2,31 +2,38 @@ package ru.moscow.ucbazar.entity.payment;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.moscow.ucbazar.enums.PaymentStatusEnum;
+
+import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @Entity(name = "_payment")
 public class UcPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private long gameId;
+    private String uuid;
+
+    private long sessionId;
 
     private String cardNumber;
 
-    private Double amount;
+    private BigDecimal amount;
 
-    private String expireDate;
+    private long uc_id;
 
-    private String extraId;
+    private long pubg_id;
 
-    private String transactionData;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatusEnum status;
 
 
 }

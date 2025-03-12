@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,10 @@ public class Items {
 
     private Boolean isActive = true;
 
-    @OneToMany
-    private List<UcEntity> uc;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "Item_id")
+    private List<UcEntity> uc = new ArrayList<>();
+
+
 }
