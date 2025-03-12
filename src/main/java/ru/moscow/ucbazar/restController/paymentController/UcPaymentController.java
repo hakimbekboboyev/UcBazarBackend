@@ -1,17 +1,22 @@
 package ru.moscow.ucbazar.restController.paymentController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.moscow.ucbazar.dto.PaymentUcDto;
+
+import ru.moscow.ucbazar.dto.OwnerCardNum;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
+import ru.moscow.ucbazar.model.GetCardOwnerInfo;
+import ru.moscow.ucbazar.responses.objectResponse.ResponseResult;
 import ru.moscow.ucbazar.responses.payment.ConfirmResponse;
 import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
+import ru.moscow.ucbazar.responses.payment.ConfirmResult;
 import ru.moscow.ucbazar.responses.payment.ResponsePaymentWithoutRegistration;
-import ru.moscow.ucbazar.responses.ResponseUcPayment;
+
+import ru.moscow.ucbazar.responses.payment.SentOtpResult;
 import ru.moscow.ucbazar.service.UcPaymentService;
 
 @RestController
@@ -19,7 +24,7 @@ import ru.moscow.ucbazar.service.UcPaymentService;
 public class UcPaymentController {
     @Autowired
     UcPaymentService ucPaymentService;
-
+/*
     @Operation(summary = "createPayment", description = "Create Payment")
     @PostMapping("/createPayment")
     public ResponseEntity<ResponseUcPayment> postPaymentUc(@RequestBody PaymentUcDto paymentUcDto,
@@ -28,20 +33,27 @@ public class UcPaymentController {
 
         return ResponseEntity.ok(responseUcPayment);
 
-    }
+    }*/
 
     @Operation(summary = "paymentWithRegs", description = "Pyment WithReg")
     @PostMapping("/payment")
-    public ResponseEntity<ResponsePaymentWithoutRegistration> payment(@RequestBody UcPaymentDto ucPaymentDto){
-        ResponseAll<ResponsePaymentWithoutRegistration> result = ucPaymentService.paymentWithoutRegistration(ucPaymentDto);
+    public ResponseEntity<ResponseResult<SentOtpResult>> payment(@RequestBody UcPaymentDto ucPaymentDto){
+        ResponseAll<ResponseResult<SentOtpResult>> result = ucPaymentService.paymentWithoutRegistration(ucPaymentDto);
 
         return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
     @Operation(summary = "confirmPayment", description = "Pyment Confirm")
     @PostMapping("/paymentConfirm")
-    public ResponseEntity<ConfirmResponse> payment(@RequestBody ConfirmPayment confirmPayment){
-        ResponseAll<ConfirmResponse> result = ucPaymentService.confirmPayment(confirmPayment);
+    public ResponseEntity<ResponseResult<ConfirmResult>> payment(@RequestBody ConfirmPayment confirmPayment){
+        ResponseAll<ResponseResult<ConfirmResult>> result = ucPaymentService.confirmPayment(confirmPayment);
+
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
+    }
+
+    @PostMapping("/getInfo")
+    public ResponseEntity<ResponseResult<GetCardOwnerInfo>> getCardInfo(@RequestBody OwnerCardNum ownerCardNum){
+        ResponseAll<ResponseResult<GetCardOwnerInfo>> result = ucPaymentService.getCardInfoByCard(ownerCardNum);
 
         return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }

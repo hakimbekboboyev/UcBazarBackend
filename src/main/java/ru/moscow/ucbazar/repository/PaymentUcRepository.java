@@ -1,3 +1,4 @@
+/*
 package ru.moscow.ucbazar.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,3 +9,4 @@ import ru.moscow.ucbazar.entity.payment.PaymentUcEntity;
 public interface PaymentUcRepository extends JpaRepository<PaymentUcEntity,Long> {
 
 }
+*/
