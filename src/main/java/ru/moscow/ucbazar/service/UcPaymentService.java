@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.moscow.ucbazar.dto.OwnerCardNum;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
@@ -15,16 +14,17 @@ import ru.moscow.ucbazar.model.GetCardOwnerInfo;
 import ru.moscow.ucbazar.entity.payment.UcPayment;
 import ru.moscow.ucbazar.enums.PaymentStatusEnum;
 
+import ru.moscow.ucbazar.model.ResendOtp;
 import ru.moscow.ucbazar.repository.PaymentWithRegsRepository;
 import ru.moscow.ucbazar.repository.UcRepository;
 import ru.moscow.ucbazar.responses.objectResponse.ResponseResult;
 
-import ru.moscow.ucbazar.responses.objectResponse.Error;
 import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.ConfirmResult;
 import ru.moscow.ucbazar.responses.payment.SentOtpResult;
 
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,8 +35,6 @@ public class UcPaymentService {
 
     @Autowired
     UcRepository ucRepository;
-    /*@Autowired
-    PaymentUcRepository paymentUcRepository;*/
 
     @Autowired
     PaymentWithRegsRepository ucPaymentRep;
@@ -87,7 +85,7 @@ public class UcPaymentService {
         return responseUcPayment;
     }*/
 
-    public ResponseAll<ResponseResult<SentOtpResult>> paymentWithoutRegistration(UcPaymentDto ucPaymentDto){
+    public ResponseAll<ResponseResult<SentOtpResult>> paymentWithoutRegistration(UcPaymentDto ucPaymentDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, password);
         String guid = UUID.randomUUID().toString();
@@ -97,63 +95,35 @@ public class UcPaymentService {
 
         HttpEntity<UcPaymentDto> entity = new HttpEntity<>(ucPaymentDto, headers);
 
-        try {
-            ResponseResult<SentOtpResult> result =  restTemplate.exchange(this.api + "/Payment/paymentWithoutRegistration",
-                    HttpMethod.POST,
-                    entity, new ParameterizedTypeReference<ResponseResult<SentOtpResult>>() {
-                    }).getBody();
 
-            assert result != null;
-            OwnerCardNum ownerCardNum = OwnerCardNum.builder()
-                    .cardNumber(ucPaymentDto.getCardNumber())
-                    .build();
-            ResponseAll<ResponseResult<GetCardOwnerInfo>> cardInfoByCard = getCardInfoByCard(ownerCardNum);
-            UcPayment ucPayment = UcPayment.builder()
-                    .cardNumber(cardInfoByCard.getResponse().getResult().getCardNumber())
-                    .sessionId(result.getResult().getSession())
-                    .amount(ucPaymentDto.getAmount())
-                    .status(PaymentStatusEnum.CREATED)
-                    .uuid(UUID.randomUUID().toString())
-                    .build();
+        ResponseResult<SentOtpResult> result = restTemplate.exchange(this.api + "/Payment/paymentWithoutRegistration",
+                HttpMethod.POST,
+                entity, new ParameterizedTypeReference<ResponseResult<SentOtpResult>>() {
+                }).getBody();
 
-            ucPaymentRep.save(ucPayment);
+        assert result != null;
+        OwnerCardNum ownerCardNum = OwnerCardNum.builder()
+                .cardNumber(ucPaymentDto.getCardNumber())
+                .build();
+        ResponseAll<ResponseResult<GetCardOwnerInfo>> cardInfoByCard = getCardInfoByCard(ownerCardNum);
+        UcPayment ucPayment = UcPayment.builder()
+                .cardNumber(cardInfoByCard.getResponse().getResult().getCardNumber())
+                .sessionId(result.getResult().getSession())
+                .amount(ucPaymentDto.getAmount())
+                .status(PaymentStatusEnum.CREATED)
+                .uuid(UUID.randomUUID().toString())
+                .build();
 
-            return ResponseAll.<ResponseResult<SentOtpResult>>builder()
-                    .response(result)
-                    .status(200)
-                    .build();
-        }
-        catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 400) {
-                ResponseResult<SentOtpResult> result =  e.getResponseBodyAs(new ParameterizedTypeReference<ResponseResult<SentOtpResult>>() {});
-                return ResponseAll.<ResponseResult<SentOtpResult>>builder()
-                        .response(result)
-                        .status(400)
-                        .build();
+        ucPaymentRep.save(ucPayment);
 
+        return ResponseAll.<ResponseResult<SentOtpResult>>builder()
+                .response(result)
+                .status(200)
+                .build();
 
-            }
-            if(e.getStatusCode().value() == 403){
-                Error error = Error.builder()
-                        .errorCode(403)
-                        .errorMessage(e.getMessage())
-                        .build();
-                ResponseResult<SentOtpResult> response = ResponseResult.<SentOtpResult>builder()
-                        .result(null)
-                        .error(error)
-                        .build();
-                return ResponseAll.<ResponseResult<SentOtpResult>>builder()
-                        .response(response)
-                        .status(403)
-                        .build();
-            }
-            throw e;
-
-
-        }
     }
 
-    public ResponseAll<ResponseResult<ConfirmResult>> confirmPayment(ConfirmPayment confirmPayment){
+    public ResponseAll<ResponseResult<ConfirmResult>> confirmPayment(ConfirmPayment confirmPayment) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, password);
 
@@ -161,69 +131,32 @@ public class UcPaymentService {
 
         HttpEntity<ConfirmPayment> entity = new HttpEntity<>(confirmPayment, headers);
 
-        try {
 
-            ResponseResult<ConfirmResult> result = restTemplate.exchange(this.api + "/Payment/confirmPayment",
-                    HttpMethod.POST,
-                    entity, new ParameterizedTypeReference<ResponseResult<ConfirmResult>>() {
-                    }).getBody();
+        ResponseResult<ConfirmResult> result = restTemplate.exchange(this.api + "/Payment/confirmPayment",
+                HttpMethod.POST,
+                entity, new ParameterizedTypeReference<ResponseResult<ConfirmResult>>() {
+                }).getBody();
 
-            assert result != null;
+        assert result != null;
 
-            Optional<UcPayment> byId = ucPaymentRep.findBySessionId(confirmPayment.getSession());
-            if(byId.isPresent()){
-                UcPayment ucPayment = byId.get();
-                ucPayment.setUuid(UUID.randomUUID().toString());
-                ucPayment.setCardNumber(result.getResult().getCardNumber());
-                ucPayment.setStatus(PaymentStatusEnum.SUCCEEDED);
-                ucPaymentRep.save(ucPayment);
-            }
-
-            return ResponseAll.<ResponseResult<ConfirmResult>>builder()
-                    .response(result)
-                    .status(200)
-                    .build();
+        Optional<UcPayment> byId = ucPaymentRep.findBySessionId(confirmPayment.getSession());
+        if (byId.isPresent()) {
+            UcPayment ucPayment = byId.get();
+            ucPayment.setUuid(UUID.randomUUID().toString());
+            ucPayment.setCardNumber(result.getResult().getCardNumber());
+            ucPayment.setStatus(PaymentStatusEnum.SUCCESS);
+            ucPaymentRep.save(ucPayment);
         }
-        catch (HttpClientErrorException e) {
 
+        return ResponseAll.<ResponseResult<ConfirmResult>>builder()
+                .response(result)
+                .status(200)
+                .build();
 
-            if (e.getStatusCode().value() == 400) {
-                ResponseResult<ConfirmResult> result =  e.getResponseBodyAs(new ParameterizedTypeReference<ResponseResult<ConfirmResult>>() {});
-
-                assert result != null;
-
-                Optional<UcPayment> byId = ucPaymentRep.findBySessionId(confirmPayment.getSession());
-                if(byId.isPresent()){
-                    UcPayment ucPayment = byId.get();
-                    ucPayment.setStatus(PaymentStatusEnum.FAILED);
-                    ucPaymentRep.save(ucPayment);
-                }
-
-                return ResponseAll.<ResponseResult<ConfirmResult>>builder()
-                        .response(result)
-                        .status(400)
-                        .build();
-            }
-            if(e.getStatusCode().value() == 403){
-                Error error = Error.builder()
-                        .errorCode(403)
-                        .errorMessage(e.getMessage())
-                        .build();
-                ResponseResult<ConfirmResult> response = ResponseResult.<ConfirmResult>builder()
-                        .result(null)
-                        .error(error)
-                        .build();
-                return ResponseAll.<ResponseResult<ConfirmResult>>builder()
-                        .response(response)
-                        .status(403)
-                        .build();
-            }
-            throw e;
-        }
     }
 
 
-    public ResponseAll<ResponseResult<GetCardOwnerInfo>> getCardInfoByCard(OwnerCardNum ownerCardNum){
+    public ResponseAll<ResponseResult<GetCardOwnerInfo>> getCardInfoByCard(OwnerCardNum ownerCardNum) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, password);
 
@@ -231,53 +164,43 @@ public class UcPaymentService {
 
         HttpEntity<OwnerCardNum> entity = new HttpEntity<>(ownerCardNum, headers);
 
-        try {
-            ResponseEntity<ResponseResult<GetCardOwnerInfo>> response = restTemplate.exchange(
-                    this.api + "/UserCard/getCardOwnerInfoByPan",
-                    HttpMethod.POST,
-                    entity,
-                    new ParameterizedTypeReference<ResponseResult<GetCardOwnerInfo>>() {}
-            );
+        ResponseEntity<ResponseResult<GetCardOwnerInfo>> response = restTemplate.exchange(
+                this.api + "/UserCard/getCardOwnerInfoByPan",
+                HttpMethod.POST,
+                entity,
+                new ParameterizedTypeReference<>() {
+                }
+        );
 
-            ResponseResult<GetCardOwnerInfo> result = response.getBody();
+        ResponseResult<GetCardOwnerInfo> result = response.getBody();
 
-            assert result != null;
-
-
-            return ResponseAll.<ResponseResult<GetCardOwnerInfo>>builder()
-                    .response(result)
-                    .status(200)
-                    .build();
-        }catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 400) {
-                ResponseResult<GetCardOwnerInfo> result =  e.getResponseBodyAs(new ParameterizedTypeReference<ResponseResult<GetCardOwnerInfo>>() {});
-
-                assert result != null;
-
-                return ResponseAll.<ResponseResult<GetCardOwnerInfo>>builder()
-                        .response(result)
-                        .status(400)
-                        .build();
-            }
-            if(e.getStatusCode().value() == 403){
-                Error error = Error.builder()
-                        .errorCode(403)
-                        .errorMessage(e.getMessage())
-                        .build();
-                ResponseResult<GetCardOwnerInfo> response = ResponseResult.<GetCardOwnerInfo>builder()
-                        .result(null)
-                        .error(error)
-                        .build();
-                return ResponseAll.<ResponseResult<GetCardOwnerInfo>>builder()
-                        .response(response)
-                        .status(403)
-                        .build();
-            }
-            throw e;
-        }
+        assert result != null;
 
 
-
-
+        return ResponseAll.<ResponseResult<GetCardOwnerInfo>>builder()
+                .response(result)
+                .status(200)
+                .build();
     }
+
+
+    public ResponseAll<ResponseResult<ResendOtp>> resendOtp(Long session) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(username, password);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentLanguage(Locale.ENGLISH);
+        HttpEntity<Long> entity = new HttpEntity<>(session, headers);
+
+
+        ResponseResult<ResendOtp> result = restTemplate.exchange(this.api + "/UserCard/resendOtp?session="+session,
+                HttpMethod.GET,
+                entity, new ParameterizedTypeReference<ResponseResult<ResendOtp>>() {
+                }).getBody();
+
+        return ResponseAll.<ResponseResult<ResendOtp>>builder()
+                .response(result)
+                .status(200)
+                .build();
+    }
+
 }

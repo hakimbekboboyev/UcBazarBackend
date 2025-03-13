@@ -1,5 +1,5 @@
 package ru.moscow.ucbazar.enums;
 
 public enum PaymentStatusEnum {
-    CREATED, PROCESS, SUCCEEDED, FAILED
+    CREATED, PROCESS, SUCCESS, FAILED
 }

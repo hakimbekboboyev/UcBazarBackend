@@ -10,6 +10,7 @@ import ru.moscow.ucbazar.dto.OwnerCardNum;
 import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
 import ru.moscow.ucbazar.model.GetCardOwnerInfo;
+import ru.moscow.ucbazar.model.ResendOtp;
 import ru.moscow.ucbazar.responses.objectResponse.ResponseResult;
 
 import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
@@ -54,6 +55,13 @@ public class UcPaymentController {
     @PostMapping("/getInfo")
     public ResponseEntity<ResponseResult<GetCardOwnerInfo>> getCardInfo(@RequestBody OwnerCardNum ownerCardNum){
         ResponseAll<ResponseResult<GetCardOwnerInfo>> result = ucPaymentService.getCardInfoByCard(ownerCardNum);
+
+        return ResponseEntity.status(result.getStatus()).body(result.getResponse());
+    }
+
+    @GetMapping("/resendOtp")
+    public ResponseEntity<ResponseResult<ResendOtp>> getCardInfo(@RequestParam Long session){
+        ResponseAll<ResponseResult<ResendOtp>> result = ucPaymentService.resendOtp(session);
 
         return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
