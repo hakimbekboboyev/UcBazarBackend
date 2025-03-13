@@ -52,6 +52,7 @@ public class UcPaymentController {
         return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
+    @Operation(summary = "GetCardInfo", description = "Get Card Info")
     @PostMapping("/getInfo")
     public ResponseEntity<ResponseResult<GetCardOwnerInfo>> getCardInfo(@RequestBody OwnerCardNum ownerCardNum){
         ResponseAll<ResponseResult<GetCardOwnerInfo>> result = ucPaymentService.getCardInfoByCard(ownerCardNum);
@@ -59,6 +60,8 @@ public class UcPaymentController {
         return ResponseEntity.status(result.getStatus()).body(result.getResponse());
     }
 
+
+    @Operation(summary = "resendOtp", description = "Resend Code Otp")
     @GetMapping("/resendOtp")
     public ResponseEntity<ResponseResult<ResendOtp>> getCardInfo(@RequestParam Long session){
         ResponseAll<ResponseResult<ResendOtp>> result = ucPaymentService.resendOtp(session);
