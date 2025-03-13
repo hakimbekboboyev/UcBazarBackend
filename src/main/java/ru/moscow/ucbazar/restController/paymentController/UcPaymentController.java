@@ -11,10 +11,10 @@ import ru.moscow.ucbazar.dto.payment.ConfirmPayment;
 import ru.moscow.ucbazar.dto.payment.UcPaymentDto;
 import ru.moscow.ucbazar.model.GetCardOwnerInfo;
 import ru.moscow.ucbazar.responses.objectResponse.ResponseResult;
-import ru.moscow.ucbazar.responses.payment.ConfirmResponse;
+
 import ru.moscow.ucbazar.responses.objectResponse.ResponseAll;
 import ru.moscow.ucbazar.responses.payment.ConfirmResult;
-import ru.moscow.ucbazar.responses.payment.ResponsePaymentWithoutRegistration;
+
 
 import ru.moscow.ucbazar.responses.payment.SentOtpResult;
 import ru.moscow.ucbazar.service.UcPaymentService;
