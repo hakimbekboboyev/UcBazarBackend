@@ -20,6 +20,8 @@ WORKDIR /app
 # Copy the built application from the previous stage
 COPY --from=build /app/build/libs/*.jar /app/app.jar
 
+
+
 # Expose the port that the app runs on
 EXPOSE 8080
 

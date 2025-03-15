@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  app:
+    image: codemylove/uc-bazar:1.2
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PAYMENT_USR=${PAYMENT_USR}
+      - PAYMENT_PASS=${PAYMENT_USR}
