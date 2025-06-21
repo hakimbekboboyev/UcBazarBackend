@@ -86,14 +86,9 @@ public class UcPaymentService {
     }*/
 
     public ResponseAll<ResponseResult<SentOtpResult>> paymentWithoutRegistration(UcPaymentDto ucPaymentDto) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(username, password);
         String guid = UUID.randomUUID().toString();
         ucPaymentDto.setExtraId(guid);
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<UcPaymentDto> entity = new HttpEntity<>(ucPaymentDto, headers);
+        HttpEntity<UcPaymentDto> entity = new HttpEntity<>(ucPaymentDto, getHeaders());
 
 
         ResponseResult<SentOtpResult> result = restTemplate.exchange(this.api + "/Payment/paymentWithoutRegistration",
@@ -124,12 +119,8 @@ public class UcPaymentService {
     }
 
     public ResponseAll<ResponseResult<ConfirmResult>> confirmPayment(ConfirmPayment confirmPayment) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(username, password);
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<ConfirmPayment> entity = new HttpEntity<>(confirmPayment, headers);
+        HttpEntity<ConfirmPayment> entity = new HttpEntity<>(confirmPayment, getHeaders());
 
 
         ResponseResult<ConfirmResult> result = restTemplate.exchange(this.api + "/Payment/confirmPayment",
@@ -157,12 +148,9 @@ public class UcPaymentService {
 
 
     public ResponseAll<ResponseResult<GetCardOwnerInfo>> getCardInfoByCard(OwnerCardNum ownerCardNum) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(username, password);
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<OwnerCardNum> entity = new HttpEntity<>(ownerCardNum, headers);
+        HttpEntity<OwnerCardNum> entity = new HttpEntity<>(ownerCardNum, getHeaders());
 
         ResponseEntity<ResponseResult<GetCardOwnerInfo>> response = restTemplate.exchange(
                 this.api + "/UserCard/getCardOwnerInfoByPan",
@@ -185,11 +173,7 @@ public class UcPaymentService {
 
 
     public ResponseAll<ResponseResult<ResendOtp>> resendOtp(Long session) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(username, password);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setContentLanguage(Locale.ENGLISH);
-        HttpEntity<Long> entity = new HttpEntity<>(session, headers);
+        HttpEntity<Long> entity = new HttpEntity<>(session, getHeaders());
 
 
         ResponseResult<ResendOtp> result = restTemplate.exchange(this.api + "/UserCard/resendOtp?session="+session,
@@ -201,6 +185,14 @@ public class UcPaymentService {
                 .response(result)
                 .status(200)
                 .build();
+    }
+
+    private HttpHeaders getHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(username, password);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentLanguage(Locale.ENGLISH);
+        return headers;
     }
 
 }
